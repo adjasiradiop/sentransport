@@ -1,0 +1,31 @@
+.stat-reseau {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-carte {
+  flex: 1;
+  min-width: 120px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-valeur {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #0a6e31;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-top: 6px;
+}
