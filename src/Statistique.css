@@ -1,0 +1,20 @@
+.statistique {
+  background-color: #0a6e31;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  width: 150px;
+}
+
+.stat-chiffre {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.stat-libelle {
+  display: block;
+  font-size: 1rem;
+  opacity: 0.9;
+}
