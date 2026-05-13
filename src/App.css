@@ -1,34 +1,31 @@
-.App {
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
-  background-color: #f5f6fa;
-  display: flex;
-  flex-direction: column;
+.compteur-recherche {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  text-align: right;
+  margin-bottom: 8px;
 }
-.contenu {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
-  flex: 1;
+
+.aucun-resultat {
+  text-align: center;
+  padding: 24px;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+  border: 2px dashed #dcdde1;
+  border-radius: 8px;
+  margin-top: 8px;
 }
+
 @media (max-width: 600px) {
-.contenu {
-padding: 12px;
-}
-}
-@media (max-width: 600px) {
-.contenu {
-padding: 12px;
-}
-.ligne-bus {
-padding: 10px 12px;
-}
-.ligne-numero {
-width: 40px;
-height: 40px;
-font-size: 1rem;
-margin-right: 12px;
-}
+  .contenu {
+    padding: 12px;
+  }
+  .ligne-bus {
+    padding: 10px 12px;
+  }
+  .ligne-numero {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    margin-right: 12px;
+  }
 }
