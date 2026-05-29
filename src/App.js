@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Header from './Header';
 import Recherche from './Recherche';
@@ -7,91 +7,142 @@ import DetailLigne from './DetailLigne';
 import Footer from './Footer';
 
 function App() {
+  // 1. États de l'application
+  const [lignes, setLignes] = useState([]);
+  const [chargement, setChargement] = useState(true);
+  const [erreur, setErreur] = useState(null);
   const [recherche, setRecherche] = useState("");
-  const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
-  const [nbRecherches, setNbRecherches] = useState(0);
+  const [ligneSelectionnee, setLigneSelectionnee] = useState(null); // Déclaré une seule fois ici
 
-  const lignes = [
-    { id: 1, numero: "1", depart: "Parcelles Assainies",
-      arrivee: "Plateau", arrets: 14,
-      listeArrets: ["Parcelles U14", "Parcelles U10",
-        "Camberene", "Patte d'Oie", "Grand Dakar",
-        "Colobane", "Ponty", "Plateau"] },
-    { id: 2, numero: "7", depart: "Guediawaye",
-      arrivee: "Place Obe", arrets: 18,
-      listeArrets: ["Guediawaye", "Pikine", "Thiaroye",
-        "Keur Massar", "Grand Yoff", "Parcelles",
-        "Liberte 6", "Place Obe"] },
-    { id: 3, numero: "15", depart: "Pikine",
-      arrivee: "Medina", arrets: 12,
-      listeArrets: ["Pikine Centre", "Thiaroye Gare",
-        "Hann", "Colobane", "Fass", "Medina"] },
-    { id: 4, numero: "23", depart: "Ouakam",
-      arrivee: "Grand Dakar", arrets: 10,
-      listeArrets: ["Ouakam Village", "Mermoz", "Fann",
-        "Point E", "Liberte 5", "Grand Dakar"] },
-    { id: 5, numero: "8", depart: "Almadies",
-      arrivee: "Colobane", arrets: 16,
-      listeArrets: ["Almadies", "Ngor", "Yoff",
-        "Ouest Foire", "Liberte 6", "Colobane"] },
-    { id: 6, numero: "12", depart: "Yoff",
-      arrivee: "Sandaga", arrets: 11,
-      listeArrets: ["Yoff Village", "Aeroport LSS",
-        "Parcelles U17", "Grand Yoff", "HLM", "Sandaga"] },
-  ];
+  // EXERCICE 1 : Extraction de la logique fetch dans une fonction réutilisable
+  const chargerDonnees = () => {
+    setChargement(true);
+    setErreur(null); // Réinitialise l'erreur avant de tenter un nouveau chargement
 
-  const lignesFiltrees = lignes.filter(l =>
-    l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
-    l.arrivee.toLowerCase().includes(recherche.toLowerCase()) ||
-    l.numero.includes(recherche)
-  );
+    fetch("http://localhost:5000/lignes")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erreur serveur : " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setLignes(data);
+        setChargement(false);
+      })
+      .catch(error => {
+        setErreur(error.message);
+        setChargement(false);
+      });
+  };
 
-  function handleRecherche(valeur) {
-    setRecherche(valeur);
-    setNbRecherches(n => n + 1);
-  }
+  // 2. Charger les données une seule fois au démarrage (Composant monté)
+  useEffect(() => {
+    chargerDonnees();
+  }, []);
 
-  function handleClickLigne(ligne) {
+  // EXERCICE 3 : Charger les détails d'une ligne depuis l'endpoint dynamique GET /lignes/<id>
+  const handleClickLigne = (ligne) => {
+    // Si la ligne cliquée est déjà sélectionnée, on la ferme au second clic
     if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
       setLigneSelectionnee(null);
     } else {
-      setLigneSelectionnee(ligne);
+      // Appel à l'API pour récupérer les données spécifiques de cette ligne
+      fetch(`http://localhost:5000/lignes/${ligne.id}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Impossible de charger les détails de cette ligne.");
+          }
+          return response.json();
+        })
+        .then(data => {
+          setLigneSelectionnee(data); // Stocke l'objet détaillé reçu de Flask
+        })
+        .catch(err => {
+          console.error("Erreur Exercice 3 :", err.message);
+          // Optionnel fallback : utiliser les données déjà en mémoire si l'API échoue
+          setLigneSelectionnee(ligne);
+        });
     }
+  };
+
+  // 3. Logique de filtrage de la barre de recherche
+  const lignesFiltrees = lignes.filter(l =>
+    l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
+    l.arrivee.toLowerCase().includes(recherche.toLowerCase()) ||
+    l.numero.toString().includes(recherche)
+  );
+
+  // --- ÉCRAN 1 : ÉTAT DE CHARGEMENT ---
+  if (chargement) {
+    return (
+      <div className="App">
+        <Header />
+        <main className="contenu">
+          <p className="message-chargement">Chargement des lignes...</p>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
+  // --- ÉCRAN 2 : ÉTAT D'ERREUR ---
+  if (erreur) {
+    return (
+      <div className="App">
+        <Header />
+        <main className="contenu">
+          <div className="message-erreur">
+            <p>Impossible de charger les lignes.</p>
+            <p className="erreur-detail">{erreur}</p>
+            <p>Vérifiez que le serveur Flask est bien lancé (python api/app.py).</p>
+            
+            {/* EXERCICE 1 : Bouton Recharger disponible en cas de panne réseau */}
+            <button className="btn-recharger" onClick={chargerDonnees}>
+              🔄 Recharger
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // --- ÉCRAN 3 : ÉTAT DE SUCCÈS (Interface Normale) ---
   return (
     <div className="App">
       <Header />
       <main className="contenu">
-        <p className="compteur-recherche">
-          Vous avez effectué {nbRecherches} recherche{nbRecherches > 1 ? "s" : ""}
-        </p>
+        
+        {/* Conteneur d'actions incluant la recherche et le bouton Recharger de l'Exercice 1 */}
+        <div className="actions-barre">
+          <Recherche valeur={recherche} onChange={setRecherche} />
+          <button className="btn-recharger" onClick={chargerDonnees}>
+            🔄 Recharger
+          </button>
+        </div>
 
-        <Recherche valeur={recherche} onChange={handleRecherche} />
-
+        {/* Compteur de lignes dynamiques */}
         <p className="resultat-recherche">
-          {lignesFiltrees.length} ligne{lignesFiltrees.length > 1 ? "s" : ""} trouvee{lignesFiltrees.length > 1 ? "s" : ""}
+          {lignesFiltrees.length} ligne{lignesFiltrees.length > 1 ? 's' : ''} trouvée{lignesFiltrees.length > 1 ? 's' : ''}
         </p>
 
-        {lignesFiltrees.length === 0 && (
-          <p className="aucun-resultat">
-            Aucune ligne trouvée pour "{recherche}".
-          </p>
-        )}
-
+        {/* Liste des lignes de bus */}
         {lignesFiltrees.map(ligne => (
           <LigneBus
             key={ligne.id}
             numero={ligne.numero}
             depart={ligne.depart}
             arrivee={ligne.arrivee}
-            arrets={ligne.arrets}
+            arrets={typeof ligne.arrets === 'number' ? ligne.arrets : ligne.arrets?.length}
             estSelectionnee={ligneSelectionnee && ligneSelectionnee.id === ligne.id}
             onClick={() => handleClickLigne(ligne)}
           />
         ))}
 
+        {/* Section détails d'une ligne sélectionnée */}
         {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
+
       </main>
       <Footer />
     </div>

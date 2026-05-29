@@ -46,5 +46,21 @@
     "arrivee": "Sandaga",
     "arrets": 11,
     "listeArrets": ["Yoff Village", "Aeroport LSS", "Parcelles U17", "Grand Yoff", "HLM", "Sandaga"]
+  },
+  {
+    "id": 7,
+    "numero": "218",
+    "depart": "Dakar",
+    "arrivee": "Rufisque",
+    "arrets": 3,
+    "listeArrets": ["Poste Thiaroye", "Mbao", "Gare Rufisque"]
+  },
+  {
+    "id": 8,
+    "numero": "AFTU 42",
+    "depart": "Guediawaye",
+    "arrivee": "Grand Yoff",
+    "arrets": 3,
+    "listeArrets": ["Marche Jeudi", "Case Baobab", "Hlm Grand Yoff"]
   }
 ]
