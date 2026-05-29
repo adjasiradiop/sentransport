@@ -4,6 +4,7 @@ import Header from './Header';
 import Recherche from './Recherche';
 import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
+import Carte from './Carte'; // Corrigé : suppression des espaces internes
 import Footer from './Footer';
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
   const [recherche, setRecherche] = useState("");
-  const [ligneSelectionnee, setLigneSelectionnee] = useState(null); // Déclaré une seule fois ici
+  const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
 
   // EXERCICE 1 : Extraction de la logique fetch dans une fonction réutilisable
   const chargerDonnees = () => {
@@ -142,6 +143,9 @@ function App() {
 
         {/* Section détails d'une ligne sélectionnée */}
         {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
+
+        {/* Affichage de la carte interactive */}
+        <Carte />
 
       </main>
       <Footer />
